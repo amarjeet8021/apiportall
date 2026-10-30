@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abhi RTO API Portal - All India RTO & Identity Verification APIs</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandNavy: '#0c2340',
+                        brandBlue: '#1d4ed8',
+                        brandCyan: '#06b6d4',
+                        brandGreen: '#16a34a',
+                        brandOrange: '#f97316',
+                        diwaliGold: '#eab308'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .tricolor-bar {
+            background: linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #128807 100%);
+            height: 4px;
+        }
+        .header-bg {
+            background: linear-gradient(90deg, #f97316 0%, #ffedd5 30%, #dcfce7 70%, #16a34a 100%);
+        }
+        .diwali-card-bg {
+            background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #4c0519 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Top Tricolor Accent Bar -->
+    <div class="tricolor-bar w-full fixed top-0 z-50"></div>
+
+    <!-- 1. FULL SCREEN AUTHENTICATION GATEWAY -->
+    <div id="authOverlay" class="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200 my-8">
+            <!-- Header Accent -->
+            <div class="bg-gradient-to-r from-orange-500 via-amber-500 to-green-600 p-6 text-white text-center relative">
+                <div class="w-12 h-12 bg-white text-blue-900 font-extrabold rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-lg mb-2">
+                    🪔
+                </div>
+                <h1 class="text-xl font-black uppercase tracking-tight">ABHI RTO API PORTAL</h1>
+                <p class="text-xs text-amber-100 font-medium">All India Identity & Vehicle Verification REST APIs</p>
+                <span class="inline-block mt-2 bg-amber-300 text-red-950 font-black text-[10px] px-3 py-0.5 rounded-full uppercase shadow">
+                    Diwali Special Offer @ ₹1000 All APIs
+                </span>
+            </div>
+
+            <!-- Notice Bar -->
+            <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 text-center text-xs text-slate-600 font-semibold">
+                Please login or register below to access the developer gateway.
+            </div>
+
+            <div class="p-6">
+                <!-- LOGIN FORM -->
+                <div id="loginFormContainer" class="space-y-4">
+                    <div class="text-center">
+                        <h2 class="text-2xl font-black text-slate-800">Login</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Enter your Username / Email & Password</p>
+                    </div>
+
+                    <form onsubmit="handleLogin(event)" class="space-y-3.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Username / Email</label>
+                            <input type="text" id="loginUsername" required placeholder="Username / Email" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+                            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50">
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white font-extrabold py-3 rounded-xl text-sm shadow-lg shadow-blue-600/30 transition transform hover:scale-[1.01]">
+                            Login to Access APIs
+                        </button>
+                    </form>
+
+                    <div class="text-center pt-3 border-t border-slate-100">
+                        <button onclick="toggleAuthMode('register')" class="text-xs font-bold text-cyan-600 hover:underline">
+                            New developer? <span class="text-blue-700 font-extrabold">Create New Account</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REGISTER FORM -->
+                <div id="registerFormContainer" class="space-y-4 hidden">
+                    <div class="text-center">
+                        <h2 class="text-2xl font-black text-slate-800">Create Developer Account</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Register now to instantly get Diwali ₹1000 Offer</p>
+                    </div>
+
+                    <form onsubmit="handleRegister(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Full Name</label>
+                            <input type="text" id="regFullName" required placeholder="Full Name" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Email Address</label>
+                            <input type="email" id="regEmail" required placeholder="developer@example.com" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Phone Number</label>
+                            <input type="tel" id="regPhone" required placeholder="Phone Number" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Password</label>
+                            <input type="password" id="regPassword" required placeholder="Password" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none bg-slate-50">
+                        </div>
+
+                        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold py-3 rounded-xl text-sm shadow-lg shadow-cyan-500/30 transition transform hover:scale-[1.01]">
+                            Register & Get API Access
+                        </button>
+                    </form>
+
+                    <div class="text-center pt-2 border-t border-slate-100">
+                        <button onclick="toggleAuthMode('login')" class="text-xs font-bold text-slate-600 hover:underline">
+                            Already registered? <span class="text-blue-600 font-extrabold">Login Here</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app" class="pt-1 flex flex-col min-h-screen hidden">
+        <!-- Top Banner Header -->
+        <header class="header-bg shadow-md border-b border-orange-200 sticky top-1 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+                
+                <!-- Left Brand & Mobile Menu -->
+                <div class="flex items-center space-x-3">
+                    <button id="sidebarToggle" class="md:hidden text-slate-700 hover:text-slate-900 p-1.5 rounded-lg bg-white/60">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-xl bg-blue-900 text-white flex items-center justify-center font-black text-xl shadow-md border border-amber-300">
+                            A
+                        </div>
+                        <div>
+                            <h1 class="text-base font-black text-blue-950 uppercase tracking-tight leading-none">ABHI RTO API</h1>
+                            <span class="text-[10px] font-extrabold text-orange-700 uppercase tracking-wider">ALL INDIA VERIFICATION</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Notepad / Search Header Widget -->
+                <div class="hidden lg:flex items-center flex-1 max-w-md mx-4">
+                    <div class="relative w-full">
+                        <input type="text" placeholder="Temporary Notepad / Query API..." class="w-full bg-white/80 border border-blue-900/20 rounded-xl pl-3 pr-8 py-1.5 text-xs focus:outline-none focus:bg-white text-slate-800 font-medium shadow-inner">
+                        <i class="fa-regular fa-clipboard absolute right-3 top-2.5 text-slate-500 text-xs"></i>
+                    </div>
+                </div>
+
+                <!-- Right Clock & User Wallet -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div id="liveClock" class="hidden sm:block text-[11px] font-extrabold text-blue-950 bg-white/70 px-3 py-1.5 rounded-xl border border-blue-900/10 font-mono">
+                        --:--:--
+                    </div>
+
+                    <button onclick="openPaymentModal(1000, 'Add Wallet Balance')" class="bg-blue-950 hover:bg-blue-900 text-white font-extrabold text-xs px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-md transition">
+                        <i class="fa-solid fa-wallet text-amber-400"></i>
+                        <span>₹<span id="userWalletDisplay">0</span></span>
+                    </button>
+
+                    <a href="https://wa.me/6285607067710" target="_blank" class="w-8 h-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition" title="WhatsApp Support">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                    </a>
+
+                    <div class="flex items-center space-x-2 border-l border-slate-300/50 pl-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow" id="userAvatarText">
+                            U
+                        </div>
+                        <div class="hidden md:block text-left">
+                            <div class="text-xs font-bold text-slate-900 leading-tight" id="headerUserName">User</div>
+                            <div class="text-[9px] font-bold text-slate-600" id="headerUserRole">Developer</div>
+                        </div>
+                        <button onclick="logout()" class="text-red-600 hover:text-red-800 text-xs p-1 ml-1" title="Logout">
+                            <i class="fa-solid fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="flex-1 max-w-7xl w-full mx-auto flex overflow-hidden">
+            
+            <!-- SIDEBAR NAVIGATION -->
+            <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between fixed md:static inset-y-0 left-0 z-30 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out shadow-lg md:shadow-none">
+                <div class="p-4 space-y-6 overflow-y-auto custom-scrollbar">
+                    
+                    <!-- Main Menu -->
+                    <div>
+                        <div class="text-[11px] font-bold text-orange-500 uppercase tracking-wider mb-2">MAIN PORTAL</div>
+                        <nav class="space-y-1">
+                            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-sm bg-blue-50 text-blue-900 border border-blue-200 transition">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-table-cells-large text-blue-600"></i>
+                                    <span>API Marketplace</span>
+                                </div>
+                            </button>
+                            <button onclick="switchTab('mykeys')" id="nav-mykeys" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-key text-slate-500"></i>
+                                    <span>My API Keys</span>
+                                </div>
+                            </button>
+                            <button onclick="openPaymentModal(1000, 'Add Wallet Balance')" id="nav-addwallet" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 hover:bg-slate-100 transition">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-wallet text-slate-500"></i>
+                                    <span>Add Wallet</span>
+                                </div>
+                                <span class="bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Instant</span>
+                            </button>
+                            <button onclick="openPaymentModal(1000, 'Diwali Flat ₹1000 All API Offer')" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-medium text-sm text-amber-800 bg-amber-50 hover:bg-amber-100 transition border border-amber-300">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i>
+                                    <span class="font-bold">Diwali ₹1000 Offer</span>
+                                </div>
+                                <span class="bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase">Hot</span>
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- API Categories -->
+                    <div>
+                        <div class="text-[11px] font-bold text-orange-500 uppercase tracking-wider mb-2">API CATEGORIES</div>
+                        <nav class="space-y-1">
+                            <a href="#services-grid" onclick="filterServices('vehicle')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-car text-indigo-500 w-5"></i>
+                                <span>Vehicle RC APIs</span>
+                            </a>
+                            <a href="#services-grid" onclick="filterServices('pan')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-id-card text-blue-500 w-5"></i>
+                                <span>PAN Verification APIs</span>
+                            </a>
+                            <a href="#services-grid" onclick="filterServices('aadhaar')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-fingerprint text-orange-500 w-5"></i>
+                                <span>Aadhaar Lookup APIs</span>
+                            </a>
+                            <a href="#services-grid" onclick="filterServices('dl')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-address-card text-sky-500 w-5"></i>
+                                <span>DL & LL Exam APIs</span>
+                            </a>
+                            <a href="#services-grid" onclick="filterServices('voter')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-check-to-slot text-teal-500 w-5"></i>
+                                <span>Voter & Identity APIs</span>
+                            </a>
+                            <a href="#services-grid" onclick="filterServices('bank')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-building-columns text-emerald-600 w-5"></i>
+                                <span>GST & Bank IFSC APIs</span>
+                            </a>
+                        </nav>
+                    </div>
+
+                    <!-- Logs & Support -->
+                    <div>
+                        <div class="text-[11px] font-bold text-orange-500 uppercase tracking-wider mb-2">LOGS & SUPPORT</div>
+                        <nav class="space-y-1">
+                            <button onclick="switchTab('transactions')" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-receipt text-emerald-500 w-5"></i>
+                                <span>Payment Records</span>
+                            </button>
+                            <a href="https://wa.me/6285607067710" target="_blank" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                                <i class="fa-brands fa-whatsapp text-emerald-600 w-5"></i>
+                                <span>WhatsApp Support</span>
+                            </a>
+                        </nav>
+                    </div>
+
+                    <!-- ADMIN ACCESS TAB -->
+                    <div id="adminMenuSection" class="pt-2 border-t border-slate-200">
+                        <button onclick="switchTab('admin')" id="nav-admin" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl font-bold text-sm text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition">
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-solid fa-user-shield text-purple-600"></i>
+                                <span>Admin Panel</span>
+                            </div>
+                            <span class="bg-purple-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Master</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 border-t border-slate-200">
+                    <div class="text-[11px] font-semibold text-slate-500">API Support System:</div>
+                    <a href="https://wa.me/6285607067710" target="_blank" class="text-xs font-bold text-emerald-600 flex items-center space-x-1.5 mt-0.5 hover:underline">
+                        <i class="fa-brands fa-whatsapp text-base"></i>
+                        <span>WhatsApp Live Assistance</span>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT DISPLAY AREA -->
+            <main class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 bg-slate-100">
+
+                <!-- 1. USER DASHBOARD / API MARKETPLACE VIEW -->
+                <div id="dashboardView" class="tab-content space-y-6">
+
+                    <!-- DIWALI BANNER CARD -->
+                    <div class="diwali-card-bg rounded-2xl p-6 text-white shadow-xl relative overflow-hidden border border-amber-500/30">
+                        <div class="absolute -right-10 -bottom-10 opacity-15 text-amber-300">
+                            <i class="fa-solid fa-laptop-code text-[220px]"></i>
+                        </div>
+                        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div class="space-y-2 max-w-xl">
+                                <span class="bg-amber-400 text-red-950 font-black text-[10px] tracking-wider uppercase px-3 py-1 rounded-full shadow">
+                                    🪔 SPECIAL DIWALI OFFER - DIRECT API ACCESS
+                                </span>
+                                <h2 class="text-2xl md:text-3xl font-black leading-tight text-amber-100">
+                                    All Verification APIs at Flat ₹1000
+                                </h2>
+                                <p class="text-xs md:text-sm text-slate-200">
+                                    Instant developer API keys for Vehicle RC, Driving License, PAN Details, Aadhaar Lookup, GST, Voter ID, and 108+ verification endpoints with 99.9% uptime SLA.
+                                </p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-amber-300/30 text-center w-full md:w-auto flex-shrink-0 shadow-lg">
+                                <div class="text-xs text-amber-300 font-extrabold uppercase tracking-wider">Diwali Festival Price</div>
+                                <div class="text-3xl font-black text-amber-400 my-1">₹1000 <span class="text-xs text-slate-400 line-through">₹3999</span></div>
+                                <button onclick="openPaymentModal(1000, 'Special Diwali Offer - All API Flat ₹1000')" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 hover:from-amber-300 hover:to-orange-400 font-black px-6 py-2.5 rounded-xl text-sm shadow-xl transition transform hover:scale-105">
+                                    Get API Key @ ₹1000
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stat Summary Row -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-terminal"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-500 font-semibold">Active Endpoints</div>
+                                <div class="text-lg font-black text-slate-800">108+ Live</div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-500 font-semibold">Avg Latency</div>
+                                <div class="text-lg font-black text-emerald-600">&lt; 120ms</div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-code-compare"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-500 font-semibold">Uptime SLA</div>
+                                <div class="text-lg font-black text-slate-800">99.98%</div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-shield-cat"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-500 font-semibold">API Auth</div>
+                                <div class="text-lg font-black text-slate-800">Bearer Token</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API CATALOG GRID -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                                <span>Verification APIs Suite</span>
+                                <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded-full">REST JSON</span>
+                            </h3>
+                            <div class="text-xs text-slate-500 font-medium">Click "API Docs & Test" to test JSON response or "Get API Key"</div>
+                        </div>
+
+                        <div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Rendered Dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. MY API KEYS & SANDBOX TAB -->
+                <div id="mykeysView" class="tab-content space-y-6 hidden">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">My API Keys & Bearer Tokens</h3>
+                                <p class="text-xs text-slate-500">Use these secret keys in your header: <code class="bg-slate-100 px-1 py-0.5 rounded font-mono text-red-600">Authorization: Bearer YOUR_API_KEY</code></p>
+                            </div>
+                            <button onclick="generateNewApiKey()" class="bg-blue-600 text-white font-extrabold px-4 py-2 rounded-xl text-xs hover:bg-blue-700 shadow">
+                                + Generate New Key
+                            </button>
+                        </div>
+
+                        <div id="userKeysContainer" class="space-y-3 pt-2">
+                            <!-- User Keys loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. TRANSACTIONS & WALLET RECORD TAB -->
+                <div id="transactionsView" class="tab-content space-y-6 hidden">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Wallet & Subscription History</h3>
+                                <p class="text-xs text-slate-500">Track all your payments, UTR submissions, and API package activations</p>
+                            </div>
+                            <button onclick="openPaymentModal(1000, 'Add Wallet')" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-blue-700 shadow">
+                                + Add Wallet
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                                        <th class="p-3 border-b">Txn ID / UTR</th>
+                                        <th class="p-3 border-b">Package / Plan</th>
+                                        <th class="p-3 border-b">Amount</th>
+                                        <th class="p-3 border-b">Date</th>
+                                        <th class="p-3 border-b">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTxnTable" class="text-xs divide-y divide-slate-100">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. MASTER ADMIN PANEL VIEW -->
+                <div id="adminView" class="tab-content space-y-6 hidden">
+                    <div class="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-2xl p-6 text-white shadow-xl flex items-center justify-between">
+                        <div>
+                            <span class="bg-purple-500/30 text-purple-200 text-xs font-bold px-3 py-1 rounded-full uppercase border border-purple-400/30">Master Administration Panel</span>
+                            <h2 class="text-2xl font-black mt-1">Abhi RTO API Admin Control</h2>
+                            <p class="text-xs text-purple-200 mt-1">Logged in as Administrator</p>
+                        </div>
+                        <button onclick="switchTab('dashboard')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold px-4 py-2 rounded-xl">
+                            Exit Admin Mode
+                        </button>
+                    </div>
+
+                    <!-- Admin KPI Metrics -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="text-xs text-slate-500 font-bold uppercase">Total Registered Users</div>
+                            <div id="adminStatUsers" class="text-3xl font-black text-slate-800 mt-1">0</div>
+                            <div class="text-[10px] text-green-600 font-semibold mt-1">↑ Direct local database sync</div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="text-xs text-slate-500 font-bold uppercase">Total API Key Sales</div>
+                            <div id="adminStatSales" class="text-3xl font-black text-blue-600 mt-1">0 Keys</div>
+                            <div class="text-[10px] text-blue-500 font-semibold mt-1">Diwali offer subscriptions</div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="text-xs text-slate-500 font-bold uppercase">Total Wallet Revenue</div>
+                            <div id="adminStatRevenue" class="text-3xl font-black text-emerald-600 mt-1">₹0</div>
+                            <div class="text-[10px] text-slate-400 font-semibold mt-1">Approved payment sum</div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="text-xs text-slate-500 font-bold uppercase">Pending UTR Verification</div>
+                            <div id="adminStatPending" class="text-3xl font-black text-orange-600 mt-1">0</div>
+                            <div class="text-[10px] text-orange-500 font-semibold mt-1">Action required below</div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Sub-tabs Menu -->
+                    <div class="flex space-x-2 border-b border-slate-200">
+                        <button onclick="switchAdminSubTab('payments')" id="btnAdminTabPayments" class="px-4 py-2 text-xs font-bold border-b-2 border-purple-600 text-purple-700">
+                            Payment Requests & UTR Verification
+                        </button>
+                        <button onclick="switchAdminSubTab('users')" id="btnAdminTabUsers" class="px-4 py-2 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+                            Registered Users & API Keys
+                        </button>
+                    </div>
+
+                    <!-- Admin Section 1: Payment Approvals -->
+                    <div id="adminPaymentsSubTab" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-base font-bold text-slate-800">BharatPe UPI Payment Requests</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase">
+                                        <th class="p-3 border-b">User</th>
+                                        <th class="p-3 border-b">UTR / Transaction ID</th>
+                                        <th class="p-3 border-b">Amount</th>
+                                        <th class="p-3 border-b">Selected Plan</th>
+                                        <th class="p-3 border-b">Date</th>
+                                        <th class="p-3 border-b">Status</th>
+                                        <th class="p-3 border-b text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminPaymentsTable" class="text-xs divide-y divide-slate-100">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Admin Section 2: Registered Users -->
+                    <div id="adminUsersSubTab" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 hidden">
+                        <h3 class="text-base font-bold text-slate-800">Registered Users Database</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase">
+                                        <th class="p-3 border-b">Full Name</th>
+                                        <th class="p-3 border-b">Email</th>
+                                        <th class="p-3 border-b">Wallet Balance</th>
+                                        <th class="p-3 border-b">Active API Key</th>
+                                        <th class="p-3 border-b">Joined Date</th>
+                                        <th class="p-3 border-b text-right">Manual Credit</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminUsersTable" class="text-xs divide-y divide-slate-100">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- BHARATPE UPI PAYMENT & DIWALI OFFER MODAL -->
+    <div id="paymentModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative">
+            <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="bg-gradient-to-r from-amber-600 to-red-700 p-6 text-white text-center">
+                <span class="bg-amber-300 text-red-950 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase shadow">🪔 Instant BharatPe Gateway</span>
+                <h3 id="paymentModalTitle" class="text-xl font-extrabold mt-1">Special Diwali Offer - All API Flat ₹1000</h3>
+                <p class="text-xs text-amber-100 mt-1">Scan QR Code or pay using BharatPe UPI ID below</p>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <!-- UPI Details Box -->
+                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl text-center">
+                    <div class="text-[11px] text-slate-500 font-bold uppercase">BharatPe Official UPI ID</div>
+                    <div class="flex items-center justify-center space-x-2 mt-1">
+                        <span id="upiIdText" class="font-extrabold text-blue-900 text-xs sm:text-sm bg-white px-2 py-1 rounded border border-slate-300 select-all font-mono">BHARATPE2Y0G0R6C3V57831@unitype</span>
+                        <button onclick="copyUpiId()" class="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-bold hover:bg-blue-700">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic QR Code Container -->
+                <div class="flex flex-col items-center justify-center py-2">
+                    <div id="qrcode" class="p-3 bg-white border-2 border-slate-200 rounded-2xl shadow-md"></div>
+                    <div id="paymentAmountDisplay" class="text-3xl font-black text-slate-800 mt-2">₹1000</div>
+                    <div class="text-[11px] font-bold text-emerald-600">Scan & Pay via PhonePe, Paytm, GooglePay, BHIM</div>
+                </div>
+
+                <!-- Transaction UTR Form -->
+                <form onsubmit="handlePaymentSubmit(event)" class="space-y-3 pt-2 border-t border-slate-100">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Enter 12-Digit UTR / Transaction Ref No.</label>
+                        <input type="text" id="payUtr" required placeholder="e.g. 430291029381" pattern="[0-9a-zA-Z]{10,18}" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl text-sm shadow-lg shadow-emerald-600/20 transition">
+                        Submit Payment Verification
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- API PLAYGROUND & DOCUMENTATION MODAL -->
+    <div id="apiDocsModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden relative flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-5 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <div id="apiModalIcon" class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                        <h3 id="apiModalTitle" class="text-base font-extrabold">Vehicle RC API Endpoint</h3>
+                        <p class="text-xs text-slate-400 font-mono">POST /api/v1/verification/vehicle-rc</p>
+                    </div>
+                </div>
+                <button onclick="closeApiDocsModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-4 text-xs">
+                <!-- Endpoint URL -->
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Endpoint URL</label>
+                    <div class="flex items-center space-x-2 bg-slate-100 p-2.5 rounded-xl border border-slate-300 font-mono text-blue-900 font-bold">
+                        <span class="bg-green-600 text-white text-[10px] px-2 py-0.5 rounded font-sans">POST</span>
+                        <span id="apiEndpointUrl" class="truncate">https://api.abhirto.com/v1/vehicle/rc</span>
+                    </div>
+                </div>
+
+                <!-- Sample CURL Request -->
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Sample cURL Request</label>
+                    <pre id="apiCurlSnippet" class="bg-slate-900 text-slate-200 p-3 rounded-xl font-mono overflow-x-auto text-[11px]">curl -X POST "https://api.abhirto.com/v1/vehicle/rc" \
+  -H "Authorization: Bearer ABHI_LIVE_KEY_982310" \
+  -H "Content-Type: application/json" \
+  -d '{"vehicle_number": "MH01AE1234"}'</pre>
+                </div>
+
+                <!-- API Tester Sandbox -->
+                <div class="border-t border-slate-200 pt-3">
+                    <h4 class="font-bold text-slate-800 text-sm mb-2">Live Response Sandbox Tester</h4>
+                    <form onsubmit="testLiveApiCall(event)" class="space-y-3">
+                        <div>
+                            <label id="apiTestInputLabel" class="block font-semibold text-slate-600 mb-1">Test Parameter Value</label>
+                            <input type="text" id="apiTestInputValue" required placeholder="MH01AE1234" class="w-full border border-slate-300 rounded-xl p-2.5 font-mono uppercase focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-4 py-2 rounded-xl shadow">
+                            Execute API Test Call
+                        </button>
+                    </form>
+
+                    <!-- JSON Output Box -->
+                    <div id="apiJsonResult" class="hidden mt-3">
+                        <label class="font-bold text-slate-700 block mb-1">JSON Response Payload</label>
+                        <pre class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-[11px] overflow-x-auto max-h-48 custom-scrollbar" id="jsonOutputContent"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERT MODAL -->
+    <div id="alertModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6 text-center space-y-3">
+            <div id="alertIconContainer" class="w-12 h-12 rounded-full bg-green-100 text-green-600 mx-auto flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h4 id="alertTitle" class="text-base font-extrabold text-slate-800">Success</h4>
+            <p id="alertMessage" class="text-xs text-slate-500">Operation completed successfully</p>
+            <button onclick="closeAlertModal()" class="w-full bg-slate-800 text-white font-bold py-2 rounded-xl text-xs hover:bg-slate-900">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        // CONFIGURATION & CONSTANTS
+        const DEFAULT_UPI = "BHARATPE2Y0G0R6C3V57831@unitype";
+        const ADMIN_CREDS = {
+            username: "6200482928",
+            password: "Abhi@219"
+        };
+
+        // API CATALOG DATABASE
+        const SERVICES_CATALOG = [
+            { id: "v_rc", name: "Vehicle RC Verification API", category: "vehicle", endpoint: "https://api.abhirto.com/v1/vehicle/rc", paramName: "vehicle_number", exampleVal: "DL01AB1234", bg: "bg-indigo-100 text-indigo-600", icon: "fa-car", badge: "Instant" },
+            { id: "p_ver", name: "PAN Verification API", category: "pan", endpoint: "https://api.abhirto.com/v1/pan/verify", paramName: "pan_number", exampleVal: "ABCDE1234F", bg: "bg-blue-100 text-blue-600", icon: "fa-id-card", badge: "Live" },
+            { id: "a_otp", name: "Aadhaar OTP Lookup API", category: "aadhaar", endpoint: "https://api.abhirto.com/v1/aadhaar/otp-generate", paramName: "aadhaar_number", exampleVal: "999988887777", bg: "bg-orange-100 text-orange-600", icon: "fa-fingerprint", badge: "Instant" },
+            { id: "dl_ver", name: "Driving License API", category: "dl", endpoint: "https://api.abhirto.com/v1/dl/verify", paramName: "dl_number", exampleVal: "DL-1420110012345", bg: "bg-sky-100 text-sky-600", icon: "fa-address-card", badge: "New" },
+            { id: "ll_exam", name: "LL Exam Status API", category: "dl", endpoint: "https://api.abhirto.com/v1/dl/ll-exam", paramName: "application_no", exampleVal: "LL20240091", bg: "bg-rose-100 text-rose-600", icon: "fa-graduation-cap", badge: "New" },
+            { id: "voter_id", name: "Voter ID Verification API", category: "voter", endpoint: "https://api.abhirto.com/v1/voter/verify", paramName: "voter_id", exampleVal: "XYZ1234567", bg: "bg-teal-100 text-teal-600", icon: "fa-check-to-slot", badge: "Instant" },
+            { id: "gst_lookup", name: "GSTIN Details API", category: "bank", endpoint: "https://api.abhirto.com/v1/gst/verify", paramName: "gstin", exampleVal: "07AAAAA0000A1Z5", bg: "bg-emerald-100 text-emerald-600", icon: "fa-building-columns", badge: "High Speed" },
+            { id: "challan_ver", name: "Vehicle Challan API", category: "vehicle", endpoint: "https://api.abhirto.com/v1/vehicle/challan", paramName: "vehicle_number", exampleVal: "MH01AE1234", bg: "bg-red-100 text-red-600", icon: "fa-file-invoice", badge: "Live" },
+            { id: "ifsc_ver", name: "Bank IFSC Lookup API", category: "bank", endpoint: "https://api.abhirto.com/v1/bank/ifsc", paramName: "ifsc_code", exampleVal: "SBIN0001234", bg: "bg-purple-100 text-purple-600", icon: "fa-piggy-bank", badge: "Free Tier" }
+        ];
+
+        // GLOBAL APPLICATION STATE
+        let currentUser = null;
+        let usersList = [];
+        let transactionsList = [];
+        let qrcodeObj = null;
+
+        // INITIALIZATION
+        window.onload = function() {
+            startClock();
+            loadLocalStorageData();
+            renderServicesGrid(SERVICES_CATALOG);
+
+            // Check Active Session
+            const savedSession = localStorage.getItem("abhi_active_session");
+            if (savedSession) {
+                try {
+                    currentUser = JSON.parse(savedSession);
+                    showMainApp();
+                    updateUIForUser();
+                } catch(err) {
+                    showAuthOverlay();
+                }
+            } else {
+                showAuthOverlay();
+            }
+
+            const sidebarBtn = document.getElementById("sidebarToggle");
+            if (sidebarBtn) {
+                sidebarBtn.addEventListener("click", () => {
+                    document.getElementById("sidebar").classList.toggle("-translate-x-full");
+                });
+            }
+        };
+
+        function showAuthOverlay() {
+            document.getElementById("authOverlay").classList.remove("hidden");
+            document.getElementById("app").classList.add("hidden");
+        }
+
+        function showMainApp() {
+            document.getElementById("authOverlay").classList.add("hidden");
+            document.getElementById("app").classList.remove("hidden");
+        }
+
+        function toggleAuthMode(mode) {
+            if (mode === 'register') {
+                document.getElementById("loginFormContainer").classList.add("hidden");
+                document.getElementById("registerFormContainer").classList.remove("hidden");
+            } else {
+                document.getElementById("registerFormContainer").classList.add("hidden");
+                document.getElementById("loginFormContainer").classList.remove("hidden");
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById("loginUsername").value.trim();
+            const pass = document.getElementById("loginPassword").value.trim();
+
+            if (!username || !pass) {
+                showAlert("Input Error", "Please fill in all fields.", "error");
+                return;
+            }
+
+            // Admin Login Credentials Check (6200482928 / Abhi@219)
+            if ((username === ADMIN_CREDS.username || username === "admin@abhirto.com") && pass === ADMIN_CREDS.password) {
+                currentUser = { 
+                    name: "Master Admin", 
+                    email: username, 
+                    phone: ADMIN_CREDS.username, 
+                    role: "admin", 
+                    balance: 99999, 
+                    apiKey: "ABHI_MASTER_KEY_6200482928" 
+                };
+                localStorage.setItem("abhi_active_session", JSON.stringify(currentUser));
+                showMainApp();
+                updateUIForUser();
+                showAlert("Admin Login Successful", "Welcome back Administrator!", "success");
+                switchTab('admin');
+                return;
+            }
+
+            // User Login Check
+            const foundUser = usersList.find(u => (u.phone === username || u.email === username) && u.pass === pass);
+            if (foundUser) {
+                currentUser = foundUser;
+                localStorage.setItem("abhi_active_session", JSON.stringify(currentUser));
+                showMainApp();
+                updateUIForUser();
+                showAlert("Login Successful", `Welcome ${currentUser.name}`, "success");
+                switchTab('dashboard');
+            } else {
+                showAlert("Login Failed", "Invalid credentials. Please register if you do not have an account.", "error");
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById("regFullName").value.trim();
+            const email = document.getElementById("regEmail").value.trim();
+            const phone = document.getElementById("regPhone").value.trim();
+            const pass = document.getElementById("regPassword").value.trim();
+
+            if (!name || !email || !phone || !pass) {
+                showAlert("Registration Error", "Please fill in all fields completely.", "error");
+                return;
+            }
+
+            // Check duplicate user
+            if (usersList.some(u => u.phone === phone || u.email.toLowerCase() === email.toLowerCase())) {
+                showAlert("Account Exists", "An account with this details already exists. Please login instead.", "error");
+                toggleAuthMode('login');
+                return;
+            }
+
+            const newUser = {
+                name: name,
+                email: email,
+                phone: phone,
+                pass: pass,
+                balance: 0,
+                joined: new Date().toISOString().split('T')[0],
+                role: "user",
+                apiKey: "ABHI_LIVE_KEY_" + Math.floor(100000 + Math.random() * 900000)
+            };
+
+            usersList.push(newUser);
+            saveUsersToStorage();
+
+            currentUser = newUser;
+            localStorage.setItem("abhi_active_session", JSON.stringify(currentUser));
+
+            showMainApp();
+            updateUIForUser();
+            showAlert("Account Created!", "Registration successful. You can now claim the Diwali ₹1000 offer!", "success");
+            switchTab('dashboard');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem("abhi_active_session");
+            showAuthOverlay();
+            showAlert("Logged Out", "You have been logged out successfully.", "info");
+        }
+
+        function startClock() {
+            const updateClock = () => {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+                const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                const clockEl = document.getElementById('liveClock');
+                if (clockEl) clockEl.innerText = `${dateStr} - ${timeStr}`;
+            };
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // LOCAL STORAGE LOAD/SAVE
+        function loadLocalStorageData() {
+            const usersData = localStorage.getItem("abhi_users_db");
+            if (usersData) {
+                try { usersList = JSON.parse(usersData); } catch(e) { usersList = []; }
+            } else {
+                usersList = [
+                    { name: "Master Admin", email: "admin@abhirto.com", phone: "6200482928", pass: "Abhi@219", balance: 99999, joined: "2026-10-30", role: "admin", apiKey: "ABHI_MASTER_KEY_6200482928" },
+                    { name: "Demo Developer", email: "demo@gmail.com", phone: "9876543210", pass: "123456", balance: 0, joined: "2026-10-30", role: "user", apiKey: "ABHI_LIVE_KEY_892301" }
+                ];
+                saveUsersToStorage();
+            }
+
+            const txnsData = localStorage.getItem("abhi_txns_db");
+            if (txnsData) {
+                try { transactionsList = JSON.parse(txnsData); } catch(e) { transactionsList = []; }
+            } else {
+                transactionsList = [
+                    { id: "TXN10293", userPhone: "9876543210", userName: "Demo Developer", utr: "430291029381", amount: 1000, plan: "Special Diwali Offer - All API Flat ₹1000", date: "2026-10-30 18:45", status: "Approved" }
+                ];
+                saveTxnsToStorage();
+            }
+        }
+
+        function saveUsersToStorage() {
+            localStorage.setItem("abhi_users_db", JSON.stringify(usersList));
+        }
+
+        function saveTxnsToStorage() {
+            localStorage.setItem("abhi_txns_db", JSON.stringify(transactionsList));
+        }
+
+        function updateUIForUser() {
+            if (!currentUser) return;
+
+            const nameEl = document.getElementById("headerUserName");
+            const avatarEl = document.getElementById("userAvatarText");
+            const walletEl = document.getElementById("userWalletDisplay");
+            const roleEl = document.getElementById("headerUserRole");
+            const adminSec = document.getElementById("adminMenuSection");
+
+            if (nameEl) nameEl.innerText = currentUser.name;
+            if (avatarEl) avatarEl.innerText = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : "U";
+            if (walletEl) walletEl.innerText = currentUser.balance;
+
+            if (currentUser.role === 'admin') {
+                if (roleEl) roleEl.innerText = "Administrator";
+                if (adminSec) adminSec.classList.remove("hidden");
+            } else {
+                if (roleEl) roleEl.innerText = "Developer";
+                if (adminSec) adminSec.classList.add("hidden");
+            }
+
+            renderUserKeys();
+            renderUserTransactions();
+            renderAdminPanel();
+        }
+
+        // RENDER API CARDS
+        function renderServicesGrid(items) {
+            const grid = document.getElementById("services-grid");
+            if (!grid) return;
+            grid.innerHTML = "";
+
+            items.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col items-start justify-between relative group";
+
+                let badgeHTML = item.badge ? `<span class="bg-green-600 text-white text-[9px] font-extrabold px-2.5 py-0.5 rounded-full absolute top-3 right-3">${item.badge}</span>` : '';
+
+                card.innerHTML = `
+                    ${badgeHTML}
+                    <div class="w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center text-xl mb-3 shadow-inner">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <div class="text-left mb-3">
+                        <h4 class="text-sm font-extrabold text-slate-800">${item.name}</h4>
+                        <div class="text-[10px] font-mono text-slate-400 truncate max-w-[180px] mt-0.5">${item.endpoint}</div>
+                    </div>
+                    <div class="w-full space-y-1.5 pt-2 border-t border-slate-100">
+                        <button onclick="openApiDocsModal('${item.id}')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs py-2 rounded-xl transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-code text-xs"></i>
+                            <span>API Docs & Test</span>
+                        </button>
+                        <button onclick="openPaymentModal(1000, 'Buy ${item.name} License')" class="w-full bg-blue-900 hover:bg-blue-950 text-white font-extrabold text-xs py-2 rounded-xl shadow-sm transition">
+                            Get API Key @ ₹1000
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterServices(cat) {
+            if (cat === 'all') renderServicesGrid(SERVICES_CATALOG);
+            else {
+                const filtered = SERVICES_CATALOG.filter(s => s.category === cat);
+                renderServicesGrid(filtered);
+            }
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
+            if (tabName === 'dashboard') document.getElementById('dashboardView').classList.remove('hidden');
+            if (tabName === 'mykeys') {
+                document.getElementById('mykeysView').classList.remove('hidden');
+                renderUserKeys();
+            }
+            if (tabName === 'transactions') document.getElementById('transactionsView').classList.remove('hidden');
+            if (tabName === 'admin') {
+                if (!currentUser || currentUser.role !== 'admin') {
+                    showAlert("Access Denied", "Admin credentials required!", "error");
+                    return;
+                }
+                document.getElementById('adminView').classList.remove('hidden');
+                renderAdminPanel();
+            }
+
+            const sidebar = document.getElementById("sidebar");
+            if (sidebar) sidebar.classList.add("-translate-x-full");
+        }
+
+        // BHARATPE UPI PAYMENT
+        function openPaymentModal(amount = 1000, planName = 'Diwali Offer') {
+            document.getElementById("paymentModal").classList.remove("hidden");
+            document.getElementById("paymentAmountDisplay").innerText = `₹${amount}`;
+            document.getElementById("paymentModalTitle").innerText = planName;
+
+            const upiString = `upi://pay?pa=${DEFAULT_UPI}&pn=AbhiRTO&am=${amount}&cu=INR`;
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = "";
+
+            qrcodeObj = new QRCode(qrContainer, {
+                text: upiString,
+                width: 160,
+                height: 160,
+                colorDark: "#0c2340",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function closePaymentModal() {
+            document.getElementById("paymentModal").classList.add("hidden");
+        }
+
+        function copyUpiId() {
+            const tempInput = document.createElement("input");
+            tempInput.value = DEFAULT_UPI;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            showAlert("Copied!", "UPI ID copied to clipboard", "success");
+        }
+
+        function handlePaymentSubmit(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                showAlert("Error", "Please login first", "error");
+                return;
+            }
+
+            const utr = document.getElementById("payUtr").value.trim();
+            const plan = document.getElementById("paymentModalTitle").innerText;
+            const amountText = document.getElementById("paymentAmountDisplay").innerText.replace('₹', '');
+
+            const newTxn = {
+                id: "TXN" + Math.floor(100000 + Math.random() * 900000),
+                userPhone: currentUser.phone,
+                userName: currentUser.name,
+                utr: utr,
+                amount: parseInt(amountText),
+                plan: plan,
+                date: new Date().toLocaleString(),
+                status: "Pending"
+            };
+
+            transactionsList.unshift(newTxn);
+            saveTxnsToStorage();
+
+            closePaymentModal();
+            document.getElementById("payUtr").value = "";
+            showAlert("Submitted", "UTR sent to Admin. All API access will activate automatically upon approval!", "success");
+
+            renderUserTransactions();
+            renderAdminPanel();
+        }
+
+        // USER KEYS DISPLAY
+        function renderUserKeys() {
+            if (!currentUser) return;
+            const container = document.getElementById("userKeysContainer");
+            if (!container) return;
+            const userKey = currentUser.apiKey || "ABHI_LIVE_KEY_GUEST";
+
+            container.innerHTML = `
+                <div class="bg-slate-900 text-white p-4 rounded-2xl space-y-2 border border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Primary Production Key</span>
+                        <span class="bg-green-600 text-white text-[9px] font-bold px-2 py-0.5 rounded">Active SLA</span>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-800 p-2.5 rounded-xl font-mono text-xs">
+                        <span class="text-emerald-400 font-bold">${userKey}</span>
+                        <button onclick="copyToClipboard('${userKey}')" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-[11px] font-sans font-bold">Copy</button>
+                    </div>
+                    <div class="text-[11px] text-slate-400">
+                        Remaining Diwali Call Credits: <span class="text-white font-bold">Unlimited Direct Access</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateNewApiKey() {
+            if (!currentUser) return;
+            currentUser.apiKey = "ABHI_LIVE_KEY_" + Math.floor(100000 + Math.random() * 900000);
+            saveUsersToStorage();
+            renderUserKeys();
+            showAlert("Key Generated", "New Bearer API key generated successfully", "success");
+        }
+
+        function copyToClipboard(text) {
+            const temp = document.createElement("input");
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            showAlert("Copied!", "API Key copied", "success");
+        }
+
+        // API DOCS & SANDBOX TESTER
+        function openApiDocsModal(apiId) {
+            const item = SERVICES_CATALOG.find(s => s.id === apiId);
+            if (!item) return;
+
+            document.getElementById("apiModalTitle").innerText = item.name;
+            document.getElementById("apiEndpointUrl").innerText = item.endpoint;
+            document.getElementById("apiCurlSnippet").innerText = `curl -X POST "${item.endpoint}" \\\n  -H "Authorization: Bearer ${currentUser ? (currentUser.apiKey || 'YOUR_KEY') : 'YOUR_KEY'}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"${item.paramName}": "${item.exampleVal}"}'`;
+            document.getElementById("apiTestInputLabel").innerText = `Parameter: ${item.paramName}`;
+            document.getElementById("apiTestInputValue").placeholder = item.exampleVal;
+            document.getElementById("apiJsonResult").classList.add("hidden");
+
+            document.getElementById("apiDocsModal").classList.remove("hidden");
+        }
+
+        function closeApiDocsModal() {
+            document.getElementById("apiDocsModal").classList.add("hidden");
+        }
+
+        function testLiveApiCall(e) {
+            e.preventDefault();
+            const val = document.getElementById("apiTestInputValue").value.trim();
+            const resBox = document.getElementById("apiJsonResult");
+            const content = document.getElementById("jsonOutputContent");
+
+            const mockPayload = {
+                status: 200,
+                success: true,
+                message: "Record fetched successfully",
+                timestamp: new Date().toISOString(),
+                data: {
+                    query_id: val,
+                    verification_status: "VERIFIED",
+                    owner_name: "SAMPLE RECORD",
+                    registration_date: "2024-01-15",
+                    authority: "RTO CENTRAL",
+                    rto_code: "DL01",
+                    api_provider: "ABHI RTO DIRECT GATEWAY"
+                }
+            };
+
+            content.innerText = JSON.stringify(mockPayload, null, 2);
+            resBox.classList.remove("hidden");
+        }
+
+        // TRANSACTIONS TABLE
+        function renderUserTransactions() {
+            if (!currentUser) return;
+            const tbody = document.getElementById("userTxnTable");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            const userTxns = transactionsList.filter(t => t.userPhone === currentUser.phone);
+            if (userTxns.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No payment records.</td></tr>`;
+                return;
+            }
+
+            userTxns.forEach(t => {
+                let badge = `<span class="bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded text-[10px]">Pending Approval</span>`;
+                if (t.status === 'Approved') badge = `<span class="bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded text-[10px]">Approved</span>`;
+                if (t.status === 'Rejected') badge = `<span class="bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded text-[10px]">Rejected</span>`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-mono font-bold text-slate-800">${t.utr}</td>
+                        <td class="p-3 font-semibold text-slate-700">${t.plan}</td>
+                        <td class="p-3 font-bold text-slate-900">₹${t.amount}</td>
+                        <td class="p-3 text-slate-500">${t.date}</td>
+                        <td class="p-3">${badge}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ADMIN PANEL FUNCTIONS
+        function renderAdminPanel() {
+            const statUsers = document.getElementById("adminStatUsers");
+            if (statUsers) statUsers.innerText = usersList.length;
+
+            const approvedTxns = transactionsList.filter(t => t.status === 'Approved');
+            const totalRev = approvedTxns.reduce((acc, t) => acc + t.amount, 0);
+            const statRev = document.getElementById("adminStatRevenue");
+            if (statRev) statRev.innerText = `₹${totalRev}`;
+
+            const pendingTxns = transactionsList.filter(t => t.status === 'Pending');
+            const statPend = document.getElementById("adminStatPending");
+            if (statPend) statPend.innerText = pendingTxns.length;
+
+            const payTbody = document.getElementById("adminPaymentsTable");
+            if (payTbody) {
+                payTbody.innerHTML = "";
+                if (transactionsList.length === 0) {
+                    payTbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No payment submissions.</td></tr>`;
+                } else {
+                    transactionsList.forEach((t, index) => {
+                        let actionBtn = "";
+                        if (t.status === 'Pending') {
+                            actionBtn = `
+                                <button onclick="approvePayment(${index})" class="bg-emerald-600 text-white font-extrabold px-2.5 py-1 rounded text-[10px] mr-1">Approve</button>
+                                <button onclick="rejectPayment(${index})" class="bg-red-600 text-white font-extrabold px-2.5 py-1 rounded text-[10px]">Reject</button>
+                            `;
+                        } else {
+                            actionBtn = `<span class="text-slate-400 font-bold">${t.status}</span>`;
+                        }
+
+                        payTbody.innerHTML += `
+                            <tr>
+                                <td class="p-3 font-bold text-slate-800">${t.userName}</td>
+                                <td class="p-3 font-mono font-bold text-blue-900">${t.utr}</td>
+                                <td class="p-3 font-black text-slate-900">₹${t.amount}</td>
+                                <td class="p-3 text-slate-600">${t.plan}</td>
+                                <td class="p-3 text-slate-500">${t.date}</td>
+                                <td class="p-3 font-bold">${t.status}</td>
+                                <td class="p-3 text-right whitespace-nowrap">${actionBtn}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            }
+
+            const userTbody = document.getElementById("adminUsersTable");
+            if (userTbody) {
+                userTbody.innerHTML = "";
+                usersList.forEach(u => {
+                    userTbody.innerHTML += `
+                        <tr>
+                            <td class="p-3 font-bold text-slate-800">${u.name}</td>
+                            <td class="p-3 text-slate-600">${u.email}</td>
+                            <td class="p-3 font-black text-emerald-600">₹${u.balance}</td>
+                            <td class="p-3 font-mono text-[10px] font-bold text-blue-600">${u.apiKey || 'abhi_live_demo'}</td>
+                            <td class="p-3 text-slate-500">${u.joined || '2026-10-30'}</td>
+                            <td class="p-3 text-right">
+                                <button onclick="adminAddWallet('${u.phone}')" class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded">+ Credit ₹1000</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function switchAdminSubTab(sub) {
+            document.getElementById("adminPaymentsSubTab").classList.add("hidden");
+            document.getElementById("adminUsersSubTab").classList.add("hidden");
+
+            if (sub === 'payments') document.getElementById("adminPaymentsSubTab").classList.remove("hidden");
+            if (sub === 'users') document.getElementById("adminUsersSubTab").classList.remove("hidden");
+        }
+
+        function approvePayment(index) {
+            const txn = transactionsList[index];
+            txn.status = 'Approved';
+
+            const targetUser = usersList.find(u => u.phone === txn.userPhone);
+            if (targetUser) {
+                targetUser.balance += txn.amount;
+                if (!targetUser.apiKey) {
+                    targetUser.apiKey = "ABHI_LIVE_KEY_" + Math.floor(100000 + Math.random() * 900000);
+                }
+                saveUsersToStorage();
+            }
+
+            saveTxnsToStorage();
+            renderAdminPanel();
+            showAlert("Approved!", `Payment of ₹${txn.amount} approved & API access activated!`, "success");
+        }
+
+        function rejectPayment(index) {
+            transactionsList[index].status = 'Rejected';
+            saveTxnsToStorage();
+            renderAdminPanel();
+            showAlert("Rejected", "Payment request rejected.", "info");
+        }
+
+        function adminAddWallet(phone) {
+            const targetUser = usersList.find(u => u.phone === phone);
+            if (targetUser) {
+                targetUser.balance += 1000;
+                saveUsersToStorage();
+                renderAdminPanel();
+                showAlert("Credited", `Added ₹1000 to ${targetUser.name}'s account`, "success");
+            }
+        }
+
+        // ALERT POPUP
+        function showAlert(title, message, type = 'success') {
+            document.getElementById("alertTitle").innerText = title;
+            document.getElementById("alertMessage").innerText = message;
+
+            const iconBox = document.getElementById("alertIconContainer");
+            if (type === 'error') {
+                iconBox.className = "w-12 h-12 rounded-full bg-red-100 text-red-600 mx-auto flex items-center justify-center text-2xl";
+                iconBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+            } else if (type === 'info') {
+                iconBox.className = "w-12 h-12 rounded-full bg-blue-100 text-blue-600 mx-auto flex items-center justify-center text-2xl";
+                iconBox.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
+            } else {
+                iconBox.className = "w-12 h-12 rounded-full bg-green-100 text-green-600 mx-auto flex items-center justify-center text-2xl";
+                iconBox.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+            }
+
+            document.getElementById("alertModal").classList.remove("hidden");
+        }
+
+        function closeAlertModal() {
+            document.getElementById("alertModal").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
